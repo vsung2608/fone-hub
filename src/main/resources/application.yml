@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Fone-Hunb
+
+application:
+  cloudinary:
+    cloud-name: FoneHub
+    api-key: 676181334112719
+    api-secret: IKOOBcTyHL_uEaWaOvYwAeJajOY
