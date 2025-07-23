@@ -2,8 +2,10 @@ package com.example.fone_hub.entity.product_spec;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Lob;
+import lombok.Data;
 
 @Embeddable
+@Data
 public class Connectivity {
     private String simType;
     private Integer simSlotCount;

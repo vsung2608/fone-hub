@@ -1,26 +1,28 @@
 package com.example.fone_hub.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
 @Entity
-public class ImageProduct {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "image_link")
-    String imageLink;
+    @Column(name = "quantity")
+    Long quantity;
 
     @ManyToOne
-    @JsonBackReference
+    @JoinColumn(name = "user_id")
+    User user;
+
+    @ManyToOne
     @JoinColumn(name = "product_id")
     Product product;
 }

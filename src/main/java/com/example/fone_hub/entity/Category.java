@@ -1,5 +1,6 @@
 package com.example.fone_hub.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,7 @@ public class Category {
     @Column(name = "description")
     String description;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    private List<Product> products;
+    List<Product> products;
 }

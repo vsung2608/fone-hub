@@ -1,6 +1,7 @@
 package com.example.fone_hub.entity;
 
 import com.example.fone_hub.enums.LinkedStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +19,7 @@ public class Brand {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "name_brand")
+    @Column(name = "name")
     String name;
 
     @Column(name = "image")
@@ -28,6 +29,7 @@ public class Brand {
     @Column(name = "status")
     LinkedStatus status;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     private List<Product> products;
 }
