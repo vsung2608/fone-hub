@@ -1,2 +1,4 @@
-package com.example.fone_hub.controller.admin;public class ProductManagementController {
+package com.example.fone_hub.controller.admin;
+
+public class ProductManagementController {
 }

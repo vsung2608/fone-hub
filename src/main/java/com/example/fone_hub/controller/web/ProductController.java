@@ -1,4 +1,4 @@
-package com.example.fone_hub.controller;
+package com.example.fone_hub.controller.web;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
