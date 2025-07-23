@@ -1,5 +1,6 @@
 package com.example.fone_hub.entity;
 
+import com.example.fone_hub.enums.StatusEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,10 +22,22 @@ public class Category {
     @Column(name = "name")
     String name;
 
+    @Column(name = "image")
+    String image;
+
     @Column(name = "description")
     String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    StatusEnum status;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     List<Product> products;
+
+    public Category(String name) {
+        this.name = name;
+    }
+
 }
