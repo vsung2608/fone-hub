@@ -3,8 +3,6 @@ package com.example.fone_hub.service.impl;
 import com.example.fone_hub.dto.request.FilterRequest;
 import com.example.fone_hub.dto.request.ProductRequest;
 import com.example.fone_hub.dto.response.ProductResponse;
-import com.example.fone_hub.entity.Brand;
-import com.example.fone_hub.entity.Category;
 import com.example.fone_hub.entity.Product;
 import com.example.fone_hub.enums.LinkedStatus;
 import com.example.fone_hub.enums.ProductStatus;
@@ -22,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,12 +70,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(ProductRequest productRequest) {
         if(productRepository.existsByNameAndStatus(productRequest.name(), ProductStatus.ACTIVE)){
-            throw new AppException(ErrorCode.ENTITY_NOT_EXIST);
+            throw new AppException(ErrorCode.ENTITY_EXIST);
         }
 
         Product newProduct = productMapper.productRequestToProduct(productRequest);
-        newProduct.setCreateDate(new Date());
-        newProduct.setStatus(ProductStatus.ACTIVE);
+        newProduct.setCreateDate(LocalDate.now());
 
         var brand = brandRepository.findByIdAndStatus(productRequest.brandId(), LinkedStatus.LINKED)
                 .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_EXIST));
@@ -114,11 +111,8 @@ public class ProductServiceImpl implements ProductService {
         if(request.quantity() != null){
             updatedProduct.setQuantity(request.quantity());
         }
-        if(request.description() != null && !request.description().isEmpty()){
-            updatedProduct.setDescription(request.description());
-        }
 
-        updatedProduct.setUpdateDate(new Date());
+        updatedProduct.setUpdateDate(LocalDate.now());
 
         productRepository.save(updatedProduct);
 

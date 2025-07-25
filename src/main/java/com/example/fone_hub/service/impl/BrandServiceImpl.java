@@ -27,6 +27,13 @@ public class BrandServiceImpl implements BrandService {
     private final BrandMapper brandMapper;
 
     @Override
+    public List<BrandResponse> getAllBrands() {
+        return brandRepository.findAll().stream()
+                .map(brandMapper::brandToBrandResponse)
+                .toList();
+    }
+
+    @Override
     public BrandResponse getBrandById(Long brandId) {
         var brand = brandRepository.findByIdAndStatus(brandId, LinkedStatus.LINKED)
                 .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_EXIST));
