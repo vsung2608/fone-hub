@@ -1,21 +1,23 @@
 package com.example.fone_hub.dto.request;
 
-import com.example.fone_hub.enums.ProductStatus;
-import jakarta.persistence.*;
-import lombok.Builder;
-
-import java.time.LocalDate;
+import com.example.fone_hub.entity.product_spec.*;
 
 public record ProductRequest(
         String name,
         Long price,
         Long discount,
-        String description,
         String color,
         Long quantity,
-        ProductStatus status,
-        Long quantitySell,
         Long brandId,
-        Long categoryId
+        Long categoryId,
+        GoodsInformation goodsInformation,
+        Design design,
+        Cpu cpu,
+        Display display,
+        Storage storage,
+        Camera camera,
+        SelfieCamera selfieCamera,
+        Connectivity connectivity,
+        Battery battery
 ) {
 }

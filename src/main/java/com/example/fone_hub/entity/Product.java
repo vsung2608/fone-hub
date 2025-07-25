@@ -37,6 +37,9 @@ public class Product{
     @Column(name = "quantity")
     Long quantity;
 
+    @Column(name = "image-description")
+    String imageDescription;
+
     @Column(name = "create_date")
     LocalDate createDate;
 

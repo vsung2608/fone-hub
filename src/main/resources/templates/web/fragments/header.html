@@ -1,10 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <title>Fone-Hub</title>
+
 </head>
 <body>
-$END$
+<header class="header" th:fragment="header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+            <a
+                    href="/home"
+                    class="d-flex align-items-center text-decoration-none"
+            >
+                <img class="logo" th:src="@{/images/logo.png}" alt="Logo" />
+            </a>
+
+            <div class="d-flex align-items-center">
+                <form
+                        class="form-inline mr-3"
+                        th:action="@{/home/search-name}"
+                        method="post"
+                        onsubmit="return checkSearch()"
+                >
+                    <div class="input-group">
+                        <input
+                                id="search"
+                                class="form-control"
+                                type="search"
+                                placeholder="Tìm kiếm sản phẩm..."
+                                aria-label="Search"
+                                name="name"
+                                th:value="${name}"
+                        />
+                        <div class="input-group-append">
+                            <button class="btn btn-custom" type="submit">
+                                <i class="fas fa-search"></i> Tìm
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Hiển thị nút đăng nhập/đăng ký khi chưa đăng nhập -->
+                <th:block th:if="${user == null}">
+                    <a th:href="@{/login}" class="btn btn-custom mr-2">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+                    </a>
+                    <a th:href="@{/register}" class="btn btn-custom">
+                        <i class="fas fa-user-plus"></i> Đăng ký
+                    </a>
+                </th:block>
+
+                <!-- Hiển thị các nút khác khi đã đăng nhập -->
+                <th:block th:if="${user != null}">
+                    <div class="dropdown mr-2">
+                        <button
+                                class="btn btn-custom dropdown-toggle"
+                                type="button"
+                                id="userDropdown"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                        >
+                            <i class="fas fa-user"></i>
+                            <span th:text="${user.username}">Tài khoản</span>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" th:href="@{/user/info}">
+                                <i class="fas fa-user-circle"></i> Thông tin tài khoản
+                            </a>
+                            <a class="dropdown-item" th:href="@{/user/history}">
+                                <i class="fas fa-history"></i> Lịch sử đơn hàng
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" th:href="@{/logout}">
+                                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+
+                    <a
+                            th:href="@{/user/cart/{id}(id=${user.id})}"
+                            class="btn btn-custom position-relative mr-2"
+                    >
+                        <i class="fas fa-shopping-cart"></i> Giỏ hàng
+                        <span
+                                th:text="${quantity}"
+                                class="badge badge-danger position-absolute"
+                                style="top: -5px; right: -5px"
+                        >0</span
+                        >
+                    </a>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</header>
 </body>
 </html>
