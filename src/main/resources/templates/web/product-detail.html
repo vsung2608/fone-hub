@@ -1,10 +1,536 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{web/layout-user.html}">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi Tiết Sản Phẩm | SportShop</title>
+    <link rel="stylesheet" th:href="@{/css/web/product-detail.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-$END$
+<div layout:fragment="content">
+    <div class="product-detail">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="product-gallery">
+                        <div class="main-image">
+                            <img
+                                    th:src="${product.images[0].imageLink}"
+                                    alt="Product Image"
+                                    id="mainImage"
+                            />
+                        </div>
+                        <div class="thumbnail-container">
+                            <img
+                                    th:each="image : ${product.images}"
+                                    th:src="${image.imageLink}"
+                                    class="thumbnail"
+                                    onclick="changeImage(this.src)"
+                                    alt="Product Thumbnail"
+                            />
+                        </div>
+                        <div class="policy">
+                            <div class="title">Chính sách sản phẩm</div>
+                            <div>
+                                <img src="https://cdn2.fptshop.com.vn/svg/Type_Bao_hanh_chinh_hang_4afa1cb34d.svg" alt="icon">
+                                Hàng chính hãng - Bảo hành 12 tháng
+                            </div>
+                            <div>
+                                <img src="https://cdn2.fptshop.com.vn/svg/icon_ktv_8c9caa2c06.svg" alt="icon">
+                                Kỹ thuật viên hỗ trợ trực tuyến
+                            </div>
+                            <div>
+                                <img src="https://cdn2.fptshop.com.vn/svg/Type_Giao_hang_toan_quoc_318e6896b4.svg" alt="icon">
+                                Miễn phí giao hàng toàn quốc
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="product-info">
+                        <div class="tag">
+                            <img src="https://cdn2.fptshop.com.vn/svg/Mien_phi_giao_hang_Detail_f24a37cad5.svg" alt="tag">
+                        </div>
+                        <h1 class="product-title" th:text="${product.name}">
+                            Tên Sản Phẩm
+                        </h1>
+                        <div class="goods-info">
+                            <div class="d-flex align-items-center justify-content-between title-spec">
+                                <span class="fw-bold">Thông số nổi bật</span>
+                                <button id="see-all-spec" type="button" data-bs-toggle="offcanvas" data-bs-target="#rightSidebar">Xem tất cả thông số</button>
+                            </div>
+                            <div class="spec-info d-flex align-items-center justify-content-between">
+                                <div class="spec-item">
+                                    <div>Chip</div>
+                                    <div class="fw-bold"><i class="fa-solid fa-microchip"></i> <span th:text="${product.cpu.cpuModel}"></span></div>
+                                </div>
+                                <div class="spec-item">
+                                    <div>Kích thước màn hình</div>
+                                    <div class="fw-bold"><i class="fa-solid fa-mobile-screen"></i> <span th:text="${product.design.dimensions}"></span></div>
+                                </div>
+                                <div class="spec-item">
+                                    <div>Thời lượng pin</div>
+                                    <div class="fw-bold"><i class="fa-solid fa-battery-full"></i> <span th:text="${product.battery.batteryLife}"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="brand-category-container">
+                            <div class="basic-info">
+                                <div>Thuơng hiệu</div>
+                                <div class="product-brand" th:text="${product.brand.name}">
+                                </div>
+                            </div>
+                            <div class="basic-info">
+                                <div>Danh mục</div>
+                                <div class="product-brand" th:text="${product.category.name}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="brand-category-container">
+                            <div class="basic-info">
+                                <div>Màu sắc</div>
+                                <div class="product-brand" th:text="${product.color}">
+                                </div>
+                            </div>
+                            <div class="basic-info">
+                                <div>Đã bán</div>
+                                <div class="product-brand" th:text="${product.quantitySell}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <form
+                                    class="form-inline mr-3"
+                                    th:action="@{/user/cart/{id}(id=${product.id})}"
+                                    method="post"
+                            >
+                                <button class="add-to-cart-btn" type="submit">
+                                    <i class="fas fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                </button>
+                            </form>
+
+                            <form
+                                    class="form-inline mr-3"
+                                    method="post"
+                            >
+                                <button class="buy-now-btn" type="submit">
+                                    <i class="fa-solid fa-basket-shopping"></i> Mua ngay
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="product-features-info">
+                            <h4><i class="fas fa-info-circle"></i> Ưu đãi thanh toán</h4>
+                            <ul>
+                                <li>
+                                    <i class="fas fa-check-circle"></i> Xem chính sách ưu đãi dành cho thành viên Smember
+                                </li>
+                                <li>
+                                    <i class="fas fa-shield-alt"></i> Hoàn tiền đến 2 triệu khi mở thẻ tín dụng HSBC
+                                </li>
+                                <li>
+                                    <i class="fas fa-exchange-alt"></i> Giảm đến 1 triệu khi thanh toán qua thẻ tin dụng Vietbank
+                                </li>
+                                <li>
+                                    <i class="fas fa-truck"></i> Giảm 500K khi thanh toán qua thẻ tín dụng OCB
+                                </li>
+                                <li>
+                                    <i class="fas fa-tshirt"></i> Giảm đến 500.000đ khi thanh toán qua Kredivo
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <!-- Sidebar Offcanvas bên phải -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="rightSidebar" aria-labelledby="rightSidebarLabel">
+            <div class="offcanvas-header">
+                <h5 id="rightSidebarLabel">Thông số kỹ thuật</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <hr class="m-0">
+            <div class="offcanvas-body pt-0">
+                <div>
+                    <div class="iamge-des">
+                        <img th:src="${product.imageDescription}" alt="image-description">
+                    </div>
+                    
+                    <!-- Thanh tab cố định -->
+                    <div class="sticky-tabs">
+                        <ul class="nav nav-tabs mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#goods-info">Thông tin hàng hóa</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#design">Thiết kế & Trọng lượng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#cpu">Bộ xử lý</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#display">Màn hình</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#storage">Lưu trữ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#camera">Camera sau</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#camera-selfie">Camera Selfie</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#connectivity">Giao tiếp & kết nối</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#battery">Thông tin Pin & Sạc</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Nội dung từng phần -->
+                    <div id="goods-info" class="scroll-target">
+                        <div class="section-title">Thông tin hàng hóa</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Xuất xứ</div>
+                            <div class="col-6" th:text="${product.goodsInformation.origin}">Trung Quốc</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Thời điểm ra mắt</div>
+                            <div class="col-6" th:text="${product.goodsInformation.launchDate}">04/2025</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Thời gian bảo hành</div>
+                            <div class="col-6" th:text="${product.goodsInformation.warrantyPeriod} + 'năm'"></div>
+                        </div>
+                    </div>
+
+                    <div id="design" class="scroll-target">
+                        <div class="section-title">Thiết kế & Trọng lượng</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Kích thước</div>
+                            <div class="col-6" th:text="${product.design.dimensions}">162.4 × 75.7 × 7.99 mm</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Trọng lượng sản phẩm</div>
+                            <div class="col-6" th:text="${product.design.weight}">190 g</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Chuẩn kháng nước / Bụi bẩn</div>
+                            <div class="col-6" th:text="${product.design.waterResistance}">IP64</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Chất liệu</div>
+                            <div class="col-6" th:text="${product.design.material}">Khung máy: Nhựa<br>Mặt lưng máy: Nhựa cao cấp</div>
+                        </div>
+                    </div>
+
+                    <div id="cpu" class="scroll-target">
+                        <div class="section-title">Bộ xử lý</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Chipset</div>
+                            <div class="col-6" th:text="${product.cpu.cpuModel}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Loại nhân</div>
+                            <div class="col-6" th:text="${product.cpu.coreType}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Số nhân</div>
+                            <div class="col-6" th:text="${product.cpu.coreCount}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Loại GPU</div>
+                            <div class="col-6" th:text="${product.cpu.gpuModel}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Dung lượng (RAM)</div>
+                            <div class="col-6" th:text="${product.cpu.ram}">2.84GHz × 8 nhân</div>
+                        </div>
+                    </div>
+
+                    <div id="display" class="scroll-target">
+                        <div class="section-title">Màn hình</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Kích thước màn hình</div>
+                            <div class="col-6" th:text="${product.display.size}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Công nghệ màn hình</div>
+                            <div class="col-6" th:text="${product.display.technology}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Chuẩn màn hình</div>
+                            <div class="col-6" th:text="${product.display.standard}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Độ phân giải</div>
+                            <div class="col-6" th:text="${product.display.displayResolution}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Độ sáng</div>
+                            <div class="col-6" th:text="${product.display.brightness}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Tấn số quét</div>
+                            <div class="col-6" th:text="${product.display.contrastRatio}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Loại cảm ứng</div>
+                            <div class="col-6" th:text="${product.display.touchType}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Chất liệu màn hình</div>
+                            <div class="col-6" th:text="${product.display.glassMaterial}">2.84GHz × 8 nhân</div>
+                        </div>
+                    </div>
+
+                    <div id="storage" class="scroll-target">
+                        <div class="section-title">Lưu trữ</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Dung lượng (ROM)</div>
+                            <div class="col-6" th:text="${product.storage.rom}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Thẻ nhớ ngoài</div>
+                            <div class="col-6" th:text="${product.storage.hasExternalMemory}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Danh bạ lưu trữ</div>
+                            <div class="col-6" th:text="${product.storage.contactStorage}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                    </div>
+
+                    <div id="camera" class="scroll-target">
+                        <div class="section-title">Camera sau</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Số camera sau</div>
+                            <div class="col-6" th:text="${product.camera.rearCameraType}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Camera 1</div>
+                            <div class="col-6" th:text="${product.camera.camera1Type}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Độ phân giải</div>
+                            <div class="col-6" th:text="${product.camera.camera1Resolution}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Camera 2</div>
+                            <div class="col-6" th:text="${product.camera.camera2Type}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Độ phân giải</div>
+                            <div class="col-6" th:text="${product.camera.camera2Resolution}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Qauy phim camera sau</div>
+                            <div class="col-6" th:text="${product.camera.cameraVideoRecording}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Tính năng</div>
+                            <div class="col-6" th:text="${product.camera.cameraFeatures}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                    </div>
+
+                    <div id="camera-selfie" class="scroll-target">
+                        <div class="section-title">Camera Selfie</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Loại camera selfie</div>
+                            <div class="col-6" th:text="${product.selfieCamera.selfieCameraType}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Độ phân giải</div>
+                            <div class="col-6" th:text="${product.selfieCamera.selfieCameraResolution}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Quay phim camera selfie</div>
+                            <div class="col-6" th:text="${product.selfieCamera.selfieCameraVideoRecording}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Tính năng</div>
+                            <div class="col-6" th:text="${product.selfieCamera.selfieCameraResolution}">2.84GHz × 8 nhân</div>
+                        </div>
+                    </div>
+
+                    <div id="connectivity" class="scroll-target">
+                        <div class="section-title">Giao tiếp & kết nối</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Thẻ SIM</div>
+                            <div class="col-6" th:text="${product.connectivity.simType}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Số khe SIM</div>
+                            <div class="col-6" th:text="${product.connectivity.simSlotCount}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Hỗ trợ mạng</div>
+                            <div class="col-6" th:text="${product.connectivity.networkSupport}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Cổng giao tiếp</div>
+                            <div class="col-6" th:text="${product.connectivity.chargingPort}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Audio Jack</div>
+                            <div class="col-6" th:text="${product.connectivity.audioJack}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Wifi</div>
+                            <div class="col-6" th:text="${product.connectivity.wifi}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Bluetooth</div>
+                            <div class="col-6" th:text="${product.connectivity.bluetooth}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Kết nối khác</div>
+                            <div class="col-6" th:text="${product.connectivity.otherConnection}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">GPS</div>
+                            <div class="col-6" th:text="${product.connectivity.gpsSystems}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                    </div>
+
+                    <div id="battery" class="scroll-target">
+                        <div class="section-title">Thông tin Pin & Sạc</div>
+                        <div class="row">
+                            <div class="col-6 label-col">Loại PIN</div>
+                            <div class="col-6" th:text="${product.battery.batteryType}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Dung luọng PIN</div>
+                            <div class="col-6" th:text="${product.battery.batteryLife}">2.84GHz × 8 nhân</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 label-col">Thông tin thêm</div>
+                            <div class="col-6"  th:text="${product.battery.additionalInfo}">Qualcomm Snapdragon XYZ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<div class="container mb-5">-->
+    <!--    <div class="comments-section">-->
+    <!--        <h3 class="comments-title">-->
+    <!--            <i class="fas fa-comments"></i> Bình luận-->
+    <!--        </h3>-->
+
+    <!--        &lt;!&ndash; Form thêm bình luận (chỉ hiện khi đã đăng nhập) &ndash;&gt;-->
+    <!--        <div class="comment-form" th:if="${user != null}">-->
+    <!--            <form-->
+    <!--                    th:action="@{/user/comment/{id}(id=${product.id})}"-->
+    <!--                    th:object="${newComment}"-->
+    <!--                    method="POST"-->
+    <!--                    onsubmit="return checkComment()"-->
+    <!--            >-->
+    <!--                <div class="form-group">-->
+    <!--              <textarea-->
+    <!--                      id="comment"-->
+    <!--                      class="form-control"-->
+    <!--                      th:field="*{messages}"-->
+    <!--                      rows="3"-->
+    <!--                      placeholder="Nhập bình luận của bạn..."-->
+    <!--              ></textarea>-->
+    <!--                </div>-->
+    <!--                <button type="submit" class="btn btn-info">-->
+    <!--                    <i class="fas fa-paper-plane"></i> Gửi bình luận-->
+    <!--                </button>-->
+    <!--            </form>-->
+    <!--        </div>-->
+
+    <!--        &lt;!&ndash; Thông báo cần đăng nhập để bình luận &ndash;&gt;-->
+    <!--        <div class="login-notice" th:if="${user == null}">-->
+    <!--            <p class="text-center">-->
+    <!--                <a th:href="@{/login}" class="btn btn-outline-primary">-->
+    <!--                    <i class="fas fa-sign-in-alt"></i> Đăng nhập để bình luận-->
+    <!--                </a>-->
+    <!--            </p>-->
+    <!--        </div>-->
+
+    <!--        &lt;!&ndash; Danh sách bình luận &ndash;&gt;-->
+    <!--        <div class="comments-list">-->
+    <!--            <div class="comment-item" th:each="item : ${comments}">-->
+    <!--                <div class="comment-header">-->
+    <!--                    <img-->
+    <!--                            th:src="@{${item.user.avatar}}"-->
+    <!--                            class="comment-avatar"-->
+    <!--                            alt="User Avatar"-->
+    <!--                    />-->
+    <!--                    <div class="comment-info">-->
+    <!--                        <h6 class="comment-username" th:text="${item.user.username}">-->
+    <!--                            Username-->
+    <!--                        </h6>-->
+    <!--                        <small class="comment-date" th:text="${item.createDate}"-->
+    <!--                        >Date</small-->
+    <!--                        >-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--                <div class="comment-content" th:text="${item.messages}">-->
+    <!--                    Nội dung bình luận...-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</div>-->
+
+    <!--&lt;!&ndash; Thêm phần service features &ndash;&gt;-->
+    <!--<div class="service-features">-->
+    <!--    <div class="container">-->
+    <!--        <div class="row">-->
+    <!--            <div class="col-md-3">-->
+    <!--                <div class="feature-box">-->
+    <!--                    <div class="feature-icon">-->
+    <!--                        <i class="fas fa-medal"></i>-->
+    <!--                    </div>-->
+    <!--                    <h4>Chất Lượng Đảm Bảo</h4>-->
+    <!--                    <p>Sản phẩm chính hãng 100%, cam kết chất lượng tốt nhất</p>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div class="col-md-3">-->
+    <!--                <div class="feature-box">-->
+    <!--                    <div class="feature-icon">-->
+    <!--                        <i class="fas fa-truck"></i>-->
+    <!--                    </div>-->
+    <!--                    <h4>Giao Hàng Nhanh</h4>-->
+    <!--                    <p>Giao hàng toàn quốc từ 2-4 ngày, miễn phí cho đơn từ 500K</p>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div class="col-md-3">-->
+    <!--                <div class="feature-box">-->
+    <!--                    <div class="feature-icon">-->
+    <!--                        <i class="fas fa-sync-alt"></i>-->
+    <!--                    </div>-->
+    <!--                    <h4>Đổi Trả Dễ Dàng</h4>-->
+    <!--                    <p>Đổi trả miễn phí trong 30 ngày nếu không hài lòng</p>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            <div class="col-md-3">-->
+    <!--                <div class="feature-box">-->
+    <!--                    <div class="feature-icon">-->
+    <!--                        <i class="fas fa-headset"></i>-->
+    <!--                    </div>-->
+    <!--                    <h4>Hỗ Trợ 24/7</h4>-->
+    <!--                    <p>Đội ngũ tư vấn viên luôn sẵn sàng hỗ trợ mọi lúc</p>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</div>-->
+
+    <script th:src="@{/js/product-detail.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
 </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdAndStatus(Long productId, ProductStatus status);
 
-    List<Product> findByNameContainingOrDescriptionContainingAndStatus(String name, String description, ProductStatus status);
+    List<Product> findByNameContainingAndStatus(String name, ProductStatus status);
 
     // Thêm 2 methods này vào ProductRepository
     Page<Product> findByStatus(ProductStatus status, Pageable pageable);
@@ -35,5 +36,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByNameAndStatus(String name, ProductStatus productStatus);
 
-    Page<Product> filter(FilterRequest request, Pageable pageable);
+    @Query("""
+        SELECT p FROM Product p
+        WHERE (:#{#req.name} IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :#{#req.name}, '%')))
+        AND (:#{#req.minPrice} IS NULL OR p.price >= :#{#req.minPrice})
+        AND (:#{#req.maxPrice} IS NULL OR p.price <= :#{#req.maxPrice})
+        AND (:#{#req.brands} IS NULL OR p.brand IN :#{#req.brands})
+        AND (:#{#req.categories} IS NULL OR p.category IN :#{#req.categories})
+    """)
+    Page<Product> filter(@Param("req") FilterRequest request, Pageable pageable);
 }
