@@ -21,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final String[] PUBLIC_URLS = {"/css/**", "/js/**", "/image/**","/web/**", "/login", "/register", "/images/**", "/admin/**"};
+    private final String[] PUBLIC_URLS = {"/css/**", "/js/**", "/image/**","/web/**", "/login", "/register", "/images/**"};
     private final UserService userService;
 
     @Bean
@@ -40,7 +40,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-//                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers(PUBLIC_URLS).permitAll()
                                 .anyRequest().authenticated()
