@@ -17,7 +17,7 @@ public class FilterRequest {
     Long maxPrice;
     Integer page;
     Integer size;
-    List<String> brands;
-    List<String> categories;
+    List<Long> brands;
+    List<Long> categories;
     Sort typeSort;
 }

@@ -6,6 +6,7 @@ import com.example.fone_hub.dto.response.ProductResponse;
 import com.example.fone_hub.enums.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,10 +14,15 @@ import java.util.List;
 public interface ProductService {
     long countProduct();
 
+    Page<ProductResponse> getAllProducts(
+            int page, int size,
+            String sortField, String sortDir
+    );
+
     Page<ProductResponse> getAllProductsPaginated(
             int page, int size,
             String sortField, String sortDir,
-            String name, ProductStatus status
+            String name, List<ProductStatus> status
     );
 
     ProductResponse getProductById(Long productId);
@@ -36,4 +42,6 @@ public interface ProductService {
     List<ProductResponse> getProductSale(int page, int size);
 
     List<ProductResponse> getProductNewest(int page, int size);
+
+    void importProductsFromExcel(MultipartFile file);
 }

@@ -31,8 +31,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingAndStatus(String name, ProductStatus status);
 
     // Thêm 2 methods này vào ProductRepository
-    Page<Product> findByStatus(ProductStatus status, Pageable pageable);
-    Page<Product> findByNameContainingIgnoreCaseAndStatus(String name, ProductStatus status, Pageable pageable);
+    Page<Product> findByStatusIn(List<ProductStatus> statuses, Pageable pageable);
+
+    Page<Product> findByNameContainingIgnoreCaseAndStatusIn(String name, List<ProductStatus> statuses, Pageable pageable);
 
     boolean existsByNameAndStatus(String name, ProductStatus productStatus);
 
@@ -41,8 +42,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         WHERE (:#{#req.name} IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :#{#req.name}, '%')))
         AND (:#{#req.minPrice} IS NULL OR p.price >= :#{#req.minPrice})
         AND (:#{#req.maxPrice} IS NULL OR p.price <= :#{#req.maxPrice})
-        AND (:#{#req.brands} IS NULL OR p.brand IN :#{#req.brands})
-        AND (:#{#req.categories} IS NULL OR p.category IN :#{#req.categories})
+        AND (:#{#req.brands} IS NULL OR p.brand.id IN :#{#req.brands})
+        AND (:#{#req.categories} IS NULL OR p.category.id IN :#{#req.categories})
     """)
     Page<Product> filter(@Param("req") FilterRequest request, Pageable pageable);
 }

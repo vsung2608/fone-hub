@@ -8,8 +8,6 @@ import com.example.fone_hub.entity.Product;
 import com.example.fone_hub.enums.ProductStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 public class ProductMapper {
 
@@ -52,22 +50,22 @@ public class ProductMapper {
 
     public Product productRequestToProduct(ProductRequest request) {
         return Product.builder()
-                .name(request.name())
-                .price(request.price())
-                .discount(request.discount())
-                .color(request.color())
-                .quantity(request.quantity())
+                .name(request.getName())
+                .price(request.getPrice())
+                .discount(request.getDiscount())
+                .color(request.getColor())
+                .quantity(request.getQuantity())
                 .status(ProductStatus.ACTIVE)
                 .quantitySell(0L)
-                .goodsInformation(request.goodsInformation())
-                .design(request.design())
-                .cpu(request.cpu())
-                .display(request.display())
-                .storage(request.storage())
-                .camera(request.camera())
-                .selfieCamera(request.selfieCamera())
-                .connectivity(request.connectivity())
-                .battery(request.battery())
+                .goodsInformation(request.getGoodsInformation())
+                .design(request.getDesign())
+                .cpu(request.getCpu())
+                .display(request.getDisplay())
+                .storage(request.getStorage())
+                .camera(request.getCamera())
+                .selfieCamera(request.getSelfieCamera())
+                .connectivity(request.getConnectivity())
+                .battery(request.getBattery())
                 .build();
     }
 }

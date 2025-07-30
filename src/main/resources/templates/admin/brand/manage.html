@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Quản lý Thương hiệu</title>
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/admin/product-manage.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/sidebar.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/brand-manage.css}">
+</head>
+<body>
+<div class="main-content">
+    <div class="header">
+        <h1>Quản Lý Thương Hiệu</h1>
+        <div class="header-actions">
+            <!-- Search Form -->
+            <form method="get" style="display: flex; align-items: center; margin: 0 10px;">
+                <div class="search-box">
+                    <input type="text"
+                           name="name"
+                           placeholder="Tìm kiếm thương hiệu..."
+                           th:value="${param.name}"
+                           style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                    <button type="submit" style="padding: 8px 12px; margin-left: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        <i class="fas fa-search"></i> Tìm
+                    </button>
+                </div>
+                <!-- Giữ lại các tham số khác khi tìm kiếm -->
+                <input type="hidden" name="page" th:value="${param.page ?: 0}">
+                <input type="hidden" name="size" th:value="${param.size ?: 10}">
+                <input type="hidden" name="sortField" th:value="${param.sortField ?: 'id'}">
+                <input type="hidden" name="sortDir" th:value="${param.sortDir ?: 'asc'}">
+            </form>
+
+            <!-- Create Brand Button -->
+            <button class="btn create-btn" onclick="openCreateModal()">
+                <i class="fas fa-plus"></i>
+                Tạo Thương Hiệu Mới
+            </button>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div th:if="${notification}" class="alert" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${notification}"></span>
+    </div>
+
+    <div th:if="${message}" class="alert" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${message}"></span>
+    </div>
+
+    <!-- Active Brands Table -->
+    <div id="activeBrandsContainer" class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>
+                    <a href="#" class="sortable-link" onclick="sortTable('id')">
+                        Mã thương hiệu
+                        <span id="sort-icon-id"></span>
+                    </a>
+                </th>
+                <th>
+                    <a href="#" class="sortable-link" onclick="sortTable('name')">
+                        Tên thương hiệu
+                        <span id="sort-icon-name"></span>
+                    </a>
+                </th>
+                <th>Ảnh</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="brand : ${brands}">
+                <td th:text="${brand.id}"></td>
+                <td th:text="${brand.name}"></td>
+                <td>
+                    <img th:if="${brand.image != null}"
+                         th:src="${brand.image}"
+                         alt="Brand Image"
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                    <span th:if="${brand.image == null}" style="color: #666;">Không có ảnh</span>
+                </td>
+                <td>
+                    <button type="button" class="action-btn btn btn-warning"
+                            th:data-id="${brand.id}"
+                            th:data-name="${brand.name}"
+                            th:data-image="${brand.image}"
+                            onclick="openUpdateModalFromData(this)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                            type="button"
+                            class="action-btn btn-danger"
+                            th:onclick="'softDeleteBrand(' + ${brand.id} + ')'"
+                    >
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+<!-- Create Brand Modal -->
+<div id="createBrandModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-plus-circle"></i> Tạo Thương Hiệu Mới</h2>
+            <button class="modal-close" onclick="closeCreateModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form
+                    th:action="@{/admin/brand/create}"
+                    th:object="${newBrand}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    id="createBrandForm"
+            >
+                <div class="modal-form-grid">
+                    <!-- Image Upload Section -->
+                    <div class="modal-image-upload">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-images"></i> Ảnh thương hiệu
+                        </h3>
+                        <div class="modal-image-preview-container">
+                            <div id="modalImagePreviewGrid" class="modal-image-preview-grid">
+                                <!-- Preview images sẽ được thêm vào đây bằng JavaScript -->
+                            </div>
+                            <div class="modal-upload-container">
+                                <input
+                                        type="file"
+                                        id="modalFiles"
+                                        name="file"
+                                        accept="image/*"
+                                        style="display: none"
+                                        onchange="previewModalImages(event)"
+                                        required
+                                />
+                                <button
+                                        type="button"
+                                        class="modal-upload-btn"
+                                        onclick="document.getElementById('modalFiles').click()"
+                                >
+                                    <i class="fas fa-upload"></i> Tải ảnh lên
+                                </button>
+                                <p style="font-size: 12px; color: #666; margin-top: 5px;">Chọn một ảnh</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Info Section -->
+                    <div class="modal-form-section">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> Thông tin thương hiệu
+                        </h3>
+
+                        <div class="modal-form-row">
+                            <div class="modal-form-group">
+                                <label><i class="fas fa-certificate"></i> Tên thương hiệu</label>
+                                <input type="text" th:field="*{name}" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-form-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeCreateModal()">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                    <button type="submit" class="modal-btn modal-btn-submit">
+                        <i class="fas fa-plus-circle"></i> Tạo thương hiệu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Brand Modal - Thêm vào cuối body trước tag </body> -->
+<div id="updateBrandModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Cập Nhật Thương Hiệu</h2>
+            <button class="modal-close" onclick="closeUpdateModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form
+                    id="updateBrandForm"
+                    method="POST"
+                    enctype="multipart/form-data"
+            >
+                <div class="modal-form-grid">
+                    <!-- Image Upload Section -->
+                    <div class="modal-image-upload">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-images"></i> Ảnh thương hiệu
+                        </h3>
+                        <div class="modal-image-preview-container">
+                            <div id="updateModalImagePreviewGrid" class="modal-image-preview-grid">
+                                <!-- Preview images sẽ được thêm vào đây bằng JavaScript -->
+                            </div>
+                            <div class="modal-upload-container">
+                                <input
+                                        type="file"
+                                        id="updateModalFiles"
+                                        name="updateFile"
+                                        accept="image/*"
+                                        style="display: none"
+                                        onchange="previewUpdateModalImages(event)"
+                                />
+                                <button
+                                        type="button"
+                                        class="modal-upload-btn"
+                                        onclick="document.getElementById('updateModalFiles').click()"
+                                >
+                                    <i class="fas fa-upload"></i> Tải ảnh lên
+                                </button>
+                                <p style="font-size: 12px; color: #666; margin-top: 5px;">Chọn một ảnh mới (tùy chọn)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Info Section -->
+                    <div class="modal-form-section">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> Thông tin thương hiệu
+                        </h3>
+
+                        <div class="modal-form-row">
+                            <div class="modal-form-group">
+                                <label><i class="fas fa-certificate"></i> Tên thương hiệu</label>
+                                <input type="text" id="updateBrandName" name="name" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-form-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeUpdateModal()">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                    <button type="submit" class="modal-btn modal-btn-submit">
+                        <i class="fas fa-save"></i> Cập nhật thương hiệu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/brand-manage.js}"></script>
+</body>
+</html>

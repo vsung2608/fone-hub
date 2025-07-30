@@ -55,7 +55,7 @@
             </ol>
             <div class="carousel-inner">
                 <div class="carousel-item active">
-                    <img alt="Banner 1" th:src="@{/images/banner1.jpg}"/>
+                    <img alt="Banner 1" th:src="@{/images/banner3.jpg}"/>
                 </div>
                 <div class="carousel-item">
                     <img alt="Banner 2" th:src="@{/images/banner2.jpg}"/>
@@ -92,7 +92,7 @@
                     <h4 th:text="${brand.name}">Brand Name</h4>
                     <a
                             class="btn btn-primary"
-                            th:href="@{/home/search/{id}(id=${brand.id})}"
+                            th:href="@{/web/filter/{id}(id=${brand.id})}"
                     >
                         Xem Sản Phẩm
                     </a>

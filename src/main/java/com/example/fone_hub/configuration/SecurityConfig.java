@@ -1,6 +1,8 @@
 package com.example.fone_hub.configuration;
 
+import com.example.fone_hub.service.UserService;
 import com.example.fone_hub.service.impl.UserDetailServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,8 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-    private final String[] PUBLIC_URLS = {"/css/**", "/js/**", "/image/**","/home/**", "/login", "/register"};
+    private final String[] PUBLIC_URLS = {"/css/**", "/js/**", "/image/**","/web/**", "/login", "/register", "/images/**"};
+    private final UserService userService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -27,7 +31,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailServiceImpl();
+        return new UserDetailServiceImpl(userService);
     }
 
     @SuppressWarnings("deprecation")

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{web/layout-user.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/web/home.css}" />
+    <link rel="stylesheet" th:href="@{/css/web/filter-product.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container">
+    <!-- Horizontal Filter Bar -->
+    <div class="filter-bar">
+        <form
+                id="filterForm"
+                th:action="@{/web/filter}"
+                th:object="${newSearch}"
+                method="POST"
+                class="filter-form"
+        >
+            <div class="filter-row">
+                <!-- Column 1: Price and Sort -->
+                <div class="price-sort-column">
+                    <!-- Price Range -->
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-tag"></i>GIÁ
+                        </label>
+                        <div class="price-inputs">
+                            <input
+                                    type="number"
+                                    class="form-control"
+                                    th:field="*{minPrice}"
+                                    placeholder="Từ"
+                            />
+                            <span class="price-separator">-</span>
+                            <input
+                                    type="number"
+                                    class="form-control"
+                                    th:field="*{maxPrice}"
+                                    placeholder="Đến"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <i class="fas fa-sort"></i>SẮP XẾP
+                        </label>
+                        <select class="form-control" th:field="*{typeSort}">
+                            <option value="NOT_SORT">Mặc định</option>
+                            <option value="SALE">Khuyến mãi nhiều nhất</option>
+                            <option value="NEW">Mới nhất</option>
+                            <option value="ORDER_PRICE">Giá thấp đến cao</option>
+                            <option value="DECS_PRICE">Giá cao đến thấp</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Column 2: Brand Filter -->
+                <div class="filter-group brand-section">
+                    <label class="filter-label">
+                        <i class="fas fa-box"></i>THƯƠNG HIỆU
+                    </label>
+                    <div class="brand-grid">
+                        <div class="brand-row">
+                            <div class="brand-item" th:each="brand : ${brands}">
+                                <input
+                                        type="checkbox"
+                                        th:id="${'brand-' + brand.name}"
+                                        th:field="*{brands}"
+                                        th:value="${brand.id}"
+                                        class="brand-checkbox"
+                                />
+                                <label
+                                        th:for="${'brand-' + brand.name}"
+                                        class="brand-label"
+                                        th:text="${brand.name}"
+                                ></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Category Filter -->
+                <div class="filter-group brand-section">
+                    <label class="filter-label">
+                        <i class="fas fa-list"></i>LOẠI SẢN PHẨM
+                    </label>
+                    <div class="brand-grid">
+                        <div class="brand-row">
+                            <div class="brand-item" th:each="category : ${categories}">
+                                <input
+                                        type="checkbox"
+                                        th:id="${'category-' + category.name}"
+                                        th:field="*{categories}"
+                                        th:value="${category.id}"
+                                        class="category-checkbox"
+                                />
+                                <label
+                                        th:for="${'category-' + category.name}"
+                                        class="brand-label"
+                                        th:text="${category.name}"
+                                ></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Button -->
+                <button type="submit" class="btn-filter">
+                    <i class="fas fa-filter"></i> Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Count -->
+    <div class="results-count">
+        <span th:text="${'Tìm thấy ' + products.size() + ' sản phẩm'}"></span>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid">
+        <div class="product-card" th:each="product : ${products}">
+            <div class="product-gallary">
+                <div class="product-image">
+                    <div class="image-container">
+                        <img
+                                alt="Product Image"
+                                th:class="${imageStat.first} ? 'active' : ''"
+                                th:each="image, imageStat : ${product.images}"
+                                th:src="${image.imageLink}"
+                        />
+                    </div>
+                    <div class="image-nav">
+                        <button
+                                th:class="${imageStat.first} ? 'image-nav-btn active' : 'image-nav-btn'"
+                                th:each="image, imageStat : ${product.images}"
+                                th:onclick="'changeImage(this, ' + ${imageStat.index} + ')'"
+                        ></button>
+                    </div>
+                </div>
+                <div class="product-spec">
+                    <div><i class="fa-solid fa-microchip"></i></div>
+                    <div th:text="${product.cpu.cpuModel}"></div>
+                    <div><i class="fa-solid fa-camera-retro"></i></div>
+                    <div th:text="'Camera ' + ${product.camera.camera1Resolution}"></div>
+                    <div><i class="fa-solid fa-battery-full"></i></div>
+                    <div th:text="${product.battery.batteryLife}"></div>
+                </div>
+            </div>
+
+            <div class="product-name" th:text="${product.name}">Product Name</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="product-price"
+                     th:attr="data-price=${product.price}, data-discount=${product.discount}">
+                    <div>
+                        <span class="old-price" style="text-decoration: line-through;"></span>
+                        <span class="badge badge-danger" th:text="'Giảm ' + ${product.discount} + '%'">Discount</span>
+                    </div>
+                    <div class="new-price" style="font-weight: bold;"></div>
+                    <div class="amount-down" style="color: seagreen;"></div>
+                </div>
+            </div>
+            <div><a class="btn btn-primary btn-detail" th:href="@{/web/products/{id}(id=${product.id})}">
+                Chi tiết
+            </a></div>
+        </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div class="no-results" th:if="${#lists.isEmpty(products)}">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <h4>Không tìm thấy sản phẩm nào</h4>
+        <p>Vui lòng thử lại với các tiêu chí khác</p>
+    </div>
+
+    <!-- Pagination -->
+    <nav th:if="${productPage.totalPages > 1}">
+        <ul class="pagination justify-content-center">
+
+            <!-- Previous Page -->
+            <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/web/search(page=${productPage.number - 1})}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                th:classappend="${i == productPage.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/web/search(page=${i})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+
+            <!-- Next Page -->
+            <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/home/search(page=${productPage.number + 1})}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+</div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script th:src="@{/js/home.js}"></script>
+    <script th:src="@{/js/product-filter.js}"></script>
+</div>
+</body>
+</html>

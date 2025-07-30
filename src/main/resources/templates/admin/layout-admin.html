@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" th:href="@{/css/admin/dashboard.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin/slidebar.css}" />
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <nav>
+        <div class="logo">
+            <img th:src="@{/images/logo.png}" alt="Logo" />
+        </div>
+        <a href="/admin" class="nav-link">
+            <i class="fas fa-home"></i><span>Trang Quản Trị</span>
+        </a>
+        <a href="/admin/user" class="nav-link">
+            <i class="fas fa-users"></i><span>Quản Lý Người Dùng</span>
+        </a>
+
+        <!-- Product Management with Dropdown -->
+        <div class="product-menu">
+            <a href="#" class="nav-link" onclick="toggleProductMenu(event)">
+                <div>
+                    <i class="fas fa-box"></i><span>Quản Lý Sản Phẩm</span>
+                </div>
+            </a>
+            <div class="submenu" id="productSubmenu">
+                <a href="/admin/products" class="nav-link">
+                    <i class="fas fa-cube"></i><span>Sản Phẩm</span>
+                </a>
+                <a href="/admin/category" class="nav-link">
+                    <i class="fas fa-tags"></i><span>Danh Mục</span>
+                </a>
+                <a href="/admin/brand" class="nav-link">
+                    <i class="fas fa-certificate"></i><span>Thương Hiệu</span>
+                </a>
+            </div>
+        </div>
+
+        <a href="/admin/order" class="nav-link">
+            <i class="fas fa-shopping-cart"></i><span>Quản Lý Đơn Hàng</span>
+        </a>
+    </nav>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Trang Quản Trị</h1>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="card-container">
+            <div class="card">
+                <i class="fas fa-users icon"></i>
+                <h5>Số lượng người dùng</h5>
+                <p>100</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-box icon"></i>
+                <h5>Số lượng sản phẩm</h5>
+                <p>100</p>
+            </div>
+
+            <div class="card">
+                <i class="fas fa-shopping-cart icon"></i>
+                <h5>Số lượng đơn hàng</h5>
+                <p th:if="${orderQuantity}" th:text="${orderQuantity}">0</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-coins icon"></i>
+                <h5>Tổng Doanh Thu</h5>
+                <p>12.306.400₫</p>
+            </div>
+        </div>
+
+        <h5>Doanh Thu Theo Ngày 1 Tháng Trở Lại</h5>
+        <canvas id="revenueChart" width="100%" height="40"></canvas>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const revenueData = /*[[${revenues}]]*/ [];
+
+            const labels = revenueData.map(item => item.date);
+            const data = revenueData.map(item => item.revenue);
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh Thu ($)',
+                        data: data,
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Ngày'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Doanh Thu ($)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            /*]]>*/
+        </script>
+
+        <h5>Top 10 sản phẩm giảm giá nhiều nhất</h5>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Số lượng trong kho</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SP01</td>
+                    <td>Honor Magic V3 5G 12GB 512GB</td>
+                    <td>100</td>
+                    <td>12-7-2025</td>
+                    <td>
+                        <a class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                        <a class="action-btn btn-warning">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button
+                                type="button"
+                                class="action-btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SP01</td>
+                    <td>Honor Magic V3 5G 12GB 512GB</td>
+                    <td>100</td>
+                    <td>12-7-2025</td>
+                    <td>
+                        <a class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                        <a class="action-btn btn-warning">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button
+                                type="button"
+                                class="action-btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SP01</td>
+                    <td>Honor Magic V3 5G 12GB 512GB</td>
+                    <td>100</td>
+                    <td>12-7-2025</td>
+                    <td>
+                        <a class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                        <a class="action-btn btn-warning">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button
+                                type="button"
+                                class="action-btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SP01</td>
+                    <td>Honor Magic V3 5G 12GB 512GB</td>
+                    <td>100</td>
+                    <td>12-7-2025</td>
+                    <td>
+                        <a class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                        <a class="action-btn btn-warning">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button
+                                type="button"
+                                class="action-btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SP01</td>
+                    <td>Honor Magic V3 5G 12GB 512GB</td>
+                    <td>100</td>
+                    <td>12-7-2025</td>
+                    <td>
+                        <a class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                        <a class="action-btn btn-warning">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <button
+                                type="button"
+                                class="action-btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+<script>
+    window.addEventListener("load", function () {
+    });
+</script>
+<script th:src="@{/js/admin.js}"></script>
+</body>
+</html>
