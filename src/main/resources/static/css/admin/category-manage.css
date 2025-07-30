@@ -1,0 +1,30 @@
+
+.current-image-label,
+.new-image-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 8px;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 0 0 4px 4px;
+}
+
+.current-image-label {
+    background: rgba(0, 123, 255, 0.8);
+}
+
+.new-image-label {
+    background: rgba(40, 167, 69, 0.8);
+}
+
+.modal-preview-item.current-image {
+    border: 2px solid #007bff;
+}
+
+.modal-preview-item.new-image {
+    border: 2px solid #28a745;
+}

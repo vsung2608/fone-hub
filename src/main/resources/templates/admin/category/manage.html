@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <nav>
+        <div class="logo">
+            <img th:src="@{/image/logo.jpg}" alt="Logo" />
+        </div>
+        <a href="/admin" class="nav-link">
+            <i class="fas fa-home"></i><span>Trang Quản Trị</span>
+        </a>
+        <a href="/admin/user" class="nav-link">
+            <i class="fas fa-users"></i><span>Quản Lý Người Dùng</span>
+        </a>
+
+        <!-- Product Management with Dropdown -->
+        <div class="product-menu">
+            <a href="#" class="nav-link" onclick="toggleProductMenu(event)">
+                <div>
+                    <i class="fas fa-box"></i><span>Quản Lý Sản Phẩm</span>
+                </div>
+            </a>
+            <div class="submenu" id="productSubmenu">
+                <a href="/admin/product" class="nav-link">
+                    <i class="fas fa-cube"></i><span>Sản Phẩm</span>
+                </a>
+                <a href="/admin/category" class="nav-link">
+                    <i class="fas fa-tags"></i><span>Danh Mục</span>
+                </a>
+                <a href="/admin/brand" class="nav-link">
+                    <i class="fas fa-certificate"></i><span>Danh mục</span>
+                </a>
+            </div>
+        </div>
+
+        <a href="/admin/order" class="nav-link">
+            <i class="fas fa-shopping-cart"></i><span>Quản Lý Đơn Hàng</span>
+        </a>
+    </nav>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Quản Lý Danh Mục</h1>
+            <div class="header-actions">
+                <!-- Search Form -->
+                <form method="get" style="display: flex; align-items: center; margin: 0 10px;">
+                    <div class="search-box">
+                        <input type="text"
+                               name="name"
+                               placeholder="Tìm kiếm danh mục..."
+                               th:value="${param.name}"
+                               style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+                        <button type="submit" style="padding: 8px 12px; margin-left: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-search"></i> Tìm
+                        </button>
+                    </div>
+                    <!-- Giữ lại các tham số khác khi tìm kiếm -->
+                    <input type="hidden" name="page" th:value="${param.page ?: 0}">
+                    <input type="hidden" name="size" th:value="${param.size ?: 10}">
+                    <input type="hidden" name="sortField" th:value="${param.sortField ?: 'id'}">
+                    <input type="hidden" name="sortDir" th:value="${param.sortDir ?: 'asc'}">
+                </form>
+
+                <!-- Create Category Button -->
+                <button class="btn create-btn" onclick="openCreateModal()">
+                    <i class="fas fa-plus"></i>
+                    Tạo Danh Mục Mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div th:if="${notification}" class="alert" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${notification}"></span>
+        </div>
+
+        <div th:if="${message}" class="alert" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${message}"></span>
+        </div>
+
+        <!-- Active Categories Table -->
+        <div id="activeCategoriesContainer" class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>
+                        <a href="#" class="sortable-link" onclick="sortTable('id')">
+                            Mã danh mục
+                            <span id="sort-icon-id"></span>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="#" class="sortable-link" onclick="sortTable('name')">
+                            Tên danh mục
+                            <span id="sort-icon-name"></span>
+                        </a>
+                    </th>
+                    <th>Ảnh</th>
+                    <th>Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="category : ${categories}">
+                    <td th:text="${category.id}"></td>
+                    <td th:text="${category.name}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create Category Modal -->
+<div id="createCategoryModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-plus-circle"></i> Tạo Danh Mục Mới</h2>
+            <button class="modal-close" onclick="closeCreateModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form
+                    th:action="@{/admin/category/create}"
+                    th:object="${newCategory}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    id="createCategoryForm"
+            >
+                <div class="modal-form-grid">
+                    <!-- Image Upload Section -->
+                    <div class="modal-image-upload">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-images"></i> Ảnh danh mục
+                        </h3>
+                        <div class="modal-image-preview-container">
+                            <div id="modalImagePreviewGrid" class="modal-image-preview-grid">
+                                <!-- Preview images sẽ được thêm vào đây bằng JavaScript -->
+                            </div>
+                            <div class="modal-upload-container">
+                                <input
+                                        type="file"
+                                        id="modalFiles"
+                                        name="file"
+                                        accept="image/*"
+                                        multiple
+                                        style="display: none"
+                                        onchange="previewModalImages(event)"
+                                        required
+                                />
+                                <button
+                                        type="button"
+                                        class="modal-upload-btn"
+                                        onclick="document.getElementById('modalFiles').click()"
+                                >
+                                    <i class="fas fa-upload"></i> Tải ảnh lên
+                                </button>
+                                <p style="font-size: 12px; color: #666; margin-top: 5px;">Có thể chọn nhiều ảnh</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Info Section -->
+                    <div class="modal-form-section">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> Thông tin danh mục
+                        </h3>
+
+                        <div class="modal-form-row">
+                            <div class="modal-form-group">
+                                <label><i class="fas fa-tags"></i> Tên danh mục</label>
+                                <input type="text" th:field="*{name}" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-form-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeCreateModal()">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                    <button type="submit" class="modal-btn modal-btn-submit">
+                        <i class="fas fa-plus-circle"></i> Tạo danh mục
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Category Modal - Thêm vào cuối body trước tag </body> -->
+<div id="updateCategoryModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit"></i> Cập Nhật Danh mục</h2>
+            <button class="modal-close" onclick="closeUpdateModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form
+                    id="updateCategoryForm"
+                    method="POST"
+                    enctype="multipart/form-data"
+            >
+                <div class="modal-form-grid">
+                    <!-- Image Upload Section -->
+                    <div class="modal-image-upload">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-images"></i> Ảnh danh mục
+                        </h3>
+                        <div class="modal-image-preview-container">
+                            <div id="updateModalImagePreviewGrid" class="modal-image-preview-grid">
+                                <!-- Preview images sẽ được thêm vào đây bằng JavaScript -->
+                            </div>
+                            <div class="modal-upload-container">
+                                <input
+                                        type="file"
+                                        id="updateModalFiles"
+                                        name="updateFile"
+                                        accept="image/*"
+                                        style="display: none"
+                                        onchange="previewUpdateModalImages(event)"
+                                />
+                                <button
+                                        type="button"
+                                        class="modal-upload-btn"
+                                        onclick="document.getElementById('updateModalFiles').click()"
+                                >
+                                    <i class="fas fa-upload"></i> Tải ảnh lên
+                                </button>
+                                <p style="font-size: 12px; color: #666; margin-top: 5px;">Chọn một ảnh mới (tùy chọn)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Info Section -->
+                    <div class="modal-form-section">
+                        <h3 class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> Thông tin danh mục
+                        </h3>
+
+                        <div class="modal-form-row">
+                            <div class="modal-form-group">
+                                <label><i class="fas fa-certificate"></i> Tên danh mục</label>
+                                <input type="text" id="updateCategoryName" name="name" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-form-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeUpdateModal()">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>
+                    <button type="submit" class="modal-btn modal-btn-submit">
+                        <i class="fas fa-save"></i> Cập nhật danh mục
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/category-manage.js}"></script>
+</body>
+</html>

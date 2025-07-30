@@ -1,9 +1,14 @@
 package com.example.fone_hub.dto.request;
 
-import jakarta.persistence.Column;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-public record CategoryRequest (
-        String name,
-        String description
-) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class CategoryRequest{
+    String name;
+    String description;
 }
