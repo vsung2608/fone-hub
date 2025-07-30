@@ -1,0 +1,312 @@
+:root {
+    --primary-gradient: linear-gradient(45deg, #4b6cb7, #182848);
+    --secondary-gradient: linear-gradient(45deg, #3494e6, #ec6ead);
+    --success-gradient: linear-gradient(45deg, #11998e, #38ef7d);
+    --danger-gradient: linear-gradient(45deg, #cb2d3e, #ef473a);
+    --sidebar-gradient: linear-gradient(180deg, #2c3e50, #1a1a1a);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Main content styles */
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+    background: #f8f9fe;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.5s ease;
+}
+
+.header h1 {
+    font-size: 28px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: var(--primary-gradient);
+    border-radius: 50px;
+    color: white;
+    opacity: 0.9;
+}
+
+.user-info:hover {
+    opacity: 1;
+}
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 0 15px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    text-align: center;
+}
+
+.card:nth-child(1) {
+    background: linear-gradient(135deg, #4b6cb7, #182848);
+}
+
+.card:nth-child(2) {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.card:nth-child(3) {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+}
+
+.card:nth-child(4) {
+    background: linear-gradient(135deg, #3494e6, #ec6ead);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card h5 {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+}
+
+.card .icon {
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 15px;
+}
+
+.alert {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    position: relative;
+    animation: slideIn 0.5s ease-out;
+    background: rgba(255, 255, 255, 0.95);
+    border-left: 4px solid #4b6cb7;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.alert i {
+    color: #4b6cb7;
+    margin-right: 10px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    nav {
+        width: 70px;
+    }
+
+    nav a span {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 70px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+h5 {
+    color: #2c3e50;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f1f1;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+thead {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+th,
+td {
+    padding: 15px;
+    text-align: left;
+}
+
+tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+    background: rgba(75, 108, 183, 0.05);
+}
+
+
+/* Loading screen styles */
+.loading-screen {
+    display: none;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .card-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .card-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    opacity: 0.9;
+    margin-right: 5px;
+}
+
+.view-btn {
+    background: var(--primary-gradient);
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, #f1c40f, #e67e22);
+}
+
+.btn-danger {
+    background: var(--danger-gradient);
+}
+
+.action-btn:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-warning:hover {
+    box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3);
+}
+
+.btn-danger:hover {
+    box-shadow: 0 5px 15px rgba(203, 45, 62, 0.3);
+}
+
+/* Thêm icons cho các nút */
+.action-btn i {
+    font-size: 14px;
+}
+
+/* Responsive cho các nút */
+@media (max-width: 768px) {
+    .action-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}

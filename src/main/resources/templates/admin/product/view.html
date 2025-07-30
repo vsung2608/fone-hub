@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/admin/product-view.css}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Thông Tin Chi Tiết Sản Phẩm</h1>
+        <a href="/admin/product" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Image Section -->
+    <div class="image-section">
+        <h2 class="section-title">
+            <i class="fas fa-images"></i> Hình Ảnh Sản Phẩm
+        </h2>
+        <div class="image-container">
+            <!-- Phần gallery bên trái -->
+            <div class="image-gallery">
+                <div class="carousel-container">
+                    <div class="carousel-images" th:each="image : ${images}">
+                        <img th:src="${image.imageLink}" alt="Product Image" />
+                        <button
+                                class="delete-btn"
+                                th:onclick="'deleteImage(' + ${image.id} + ')'"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phần upload bên phải -->
+            <div class="upload-section">
+                <form
+                        th:action="@{/admin/product/add-image/{id}(id=${product.id})}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="image-upload-form"
+                >
+                    <div class="preview-container">
+                        <img id="preview" src="#" alt="Preview" style="display: none" />
+                    </div>
+                    <div class="upload-controls">
+                        <input
+                                type="file"
+                                id="imageFile"
+                                name="file"
+                                accept="image/*"
+                                style="display: none"
+                                onchange="previewImage(event)"
+                        />
+                        <button
+                                type="button"
+                                class="upload-btn"
+                                onclick="document.getElementById('imageFile').click()"
+                        >
+                            <i class="fas fa-upload"></i> Chọn ảnh
+                        </button>
+                        <button
+                                type="submit"
+                                class="submit-btn"
+                                id="submitBtn"
+                                style="display: none"
+                        >
+                            <i class="fas fa-plus"></i> Thêm ảnh
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-info-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i> Thông Tin Sản Phẩm
+            </h2>
+        </div>
+        <div>
+            <h5 id="rightSidebarLabel">Thông số kỹ thuật</h5>
+            <hr class="m-0">
+            <div class="sticky-tabs">
+                <ul class="nav nav-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#base-info">Thông tin cơ bản</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#goods-info">Thông tin hàng hóa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#design">Thiết kế & Trọng lượng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#cpu">Bộ xử lý</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#display">Màn hình</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#storage">Lưu trữ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#camera">Camera sau</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#camera-selfie">Camera Selfie</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#connectivity">Giao tiếp & kết nối</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#battery">Thông tin Pin & Sạc</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Nội dung từng phần -->
+            <div id="base-info" class="scroll-target">
+                <div class="section-title">Thông tin cơ bản</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">ID</div>
+                        <div class="info-value" th:text="${product.id}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Tên sản phẩm</div>
+                        <div class="info-value" th:text="${product.name}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Màu sắc</div>
+                        <div class="info-value" th:text="${product.color}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Giá</div>
+                        <div class="info-value" th:text="${product.price + '$'}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Giảm giá</div>
+                        <div class="info-value" th:text="${product.discount + '%'}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Thương hiệu</div>
+                        <div class="info-value" th:text="${brand.name}"></div>
+                    </div>
+                    <div class="info-card" th:if="${category.name != null}">
+                        <div class="info-label">Danh mục</div>
+                        <div class="info-value" th:text="${category.name}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Số lượng trong kho</div>
+                        <div class="info-value" th:text="${product.quantity}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Ngày tạo</div>
+                        <div class="info-value" th:text="${product.createDate}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="goods-info" class="scroll-target">
+                <div class="section-title">Thông tin hàng hóa</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Xuất xứ</div>
+                        <div class="info-value" th:text="${product.goodsInformation.origin}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Thời điểm ra mắt</div>
+                        <div class="info-value" th:text="${product.goodsInformation.launchDate}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Thời gian bảo hành</div>
+                        <div class="info-value" th:text="${product.goodsInformation.warrantyPeriod} + 'năm'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="design" class="scroll-target">
+                <div class="section-title">Thiết kế & Trọng lượng</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Kích thước</div>
+                        <div class="info-value" th:text="${product.design.dimensions}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Trọng lượng sản phẩm</div>
+                        <div class="info-value" th:text="${product.design.weight}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Chuẩn kháng nước / Bụi bẩn</div>
+                        <div class="info-value" th:text="${product.design.waterResistance}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Chất liệu</div>
+                        <div class="info-value"  th:text="${product.design.material}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cpu" class="scroll-target">
+                <div class="section-title">Bộ xử lý</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Chipset</div>
+                        <div class="info-value" th:text="${product.cpu.cpuModel}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Loại nhân</div>
+                        <div class="info-value" th:text="${product.cpu.coreType}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Số nhân</div>
+                        <div class="info-value" th:text="${product.cpu.coreCount}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Loại GPU</div>
+                        <div class="info-value" th:text="${product.cpu.gpuModel}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Dung lượng (RAM)</div>
+                        <div class="info-value" th:text="${product.cpu.ram}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="display" class="scroll-target">
+                <div class="section-title">Màn hình</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Kích thước màn hình</div>
+                        <div class="info-value" th:text="${product.display.size}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Công nghệ màn hình</div>
+                        <div class="info-value" th:text="${product.display.technology}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Chuẩn màn hình</div>
+                        <div class="info-value" th:text="${product.display.standard}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Độ phân giải</div>
+                        <div class="info-value" th:text="${product.display.displayResolution}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Độ sáng</div>
+                        <div class="info-value" th:text="${product.display.brightness}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Tấn số quét</div>
+                        <div class="info-value" th:text="${product.display.contrastRatio}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Loại cảm ứng</div>
+                        <div class="info-value" th:text="${product.display.touchType}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Chất liệu màn hình</div>
+                        <div class="info-value" th:text="${product.display.glassMaterial}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="storage" class="scroll-target">
+                <div class="section-title">Lưu trữ</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Dung lượng (ROM)</div>
+                        <div class="info-value" th:text="${product.storage.rom}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Thẻ nhớ ngoài</div>
+                        <div class="info-value"th:text="${product.storage.hasExternalMemory}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Danh bạ lưu trữ</div>
+                        <div class="info-value" th:text="${product.storage.contactStorage}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="camera" class="scroll-target">
+                <div class="section-title">Camera sau</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Số camera sau</div>
+                        <div class="info-value" th:text="${product.camera.rearCameraType}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Camera 1</div>
+                        <div class="info-value" th:text="${product.camera.camera1Type}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Độ phân giải</div>
+                        <div class="info-value" th:text="${product.camera.camera1Resolution}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Camera 2</div>
+                        <div class="info-value" th:text="${product.camera.camera2Type}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Độ phân giải</div>
+                        <div class="info-value"  th:text="${product.camera.camera2Resolution}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Quay phim camera sau</div>
+                        <div class="info-value" th:text="${product.camera.cameraVideoRecording}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Tính năng</div>
+                        <div class="info-value" th:text="${product.camera.cameraFeatures}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="camera-selfie" class="scroll-target">
+                <div class="section-title">Camera Selfie</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Loại camera selfie</div>
+                        <div class="info-value" th:text="${product.selfieCamera.selfieCameraType}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Độ phân giải</div>
+                        <div class="info-value" th:text="${product.selfieCamera.selfieCameraResolution}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Quay phim camera selfie</div>
+                        <div class="info-value" th:text="${product.selfieCamera.selfieCameraVideoRecording}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Tính năng</div>
+                        <div class="info-value" th:text="${product.selfieCamera.selfieCameraResolution}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="connectivity" class="scroll-target">
+                <div class="section-title">Giao tiếp & kết nối</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Thẻ SIM</div>
+                        <div class="info-value"  th:text="${product.connectivity.simType}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Số khe SIM</div>
+                        <div class="info-value" th:text="${product.connectivity.simSlotCount}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Hỗ trợ mạng</div>
+                        <div class="info-value" th:text="${product.connectivity.networkSupport}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Cổng giao tiếp</div>
+                        <div class="info-value" th:text="${product.connectivity.chargingPort}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Audio Jack</div>
+                        <div class="info-value" th:text="${product.connectivity.audioJack}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Wifi</div>
+                        <div class="info-value" th:text="${product.connectivity.wifi}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Bluetooth</div>
+                        <div class="info-value" th:text="${product.connectivity.bluetooth}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Kết nối khác</div>
+                        <div class="info-value" th:text="${product.connectivity.otherConnection}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">GPS</div>
+                        <div class="info-value" th:text="${product.connectivity.gpsSystems}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="battery" class="scroll-target">
+                <div class="section-title">Thông tin Pin & Sạc</div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Loại PIN</div>
+                        <div class="info-value" th:text="${product.battery.batteryType}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Dung luọng PIN</div>
+                        <div class="info-value" th:text="${product.battery.batteryLife}"></div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Thông tin thêm</div>
+                        <div class="info-value" th:text="${product.battery.additionalInfo}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/product-view.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

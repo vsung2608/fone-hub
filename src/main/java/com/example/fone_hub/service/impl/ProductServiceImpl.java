@@ -3,6 +3,8 @@ package com.example.fone_hub.service.impl;
 import com.example.fone_hub.dto.request.FilterRequest;
 import com.example.fone_hub.dto.request.ProductRequest;
 import com.example.fone_hub.dto.response.ProductResponse;
+import com.example.fone_hub.entity.Brand;
+import com.example.fone_hub.entity.Category;
 import com.example.fone_hub.entity.Product;
 import com.example.fone_hub.enums.LinkedStatus;
 import com.example.fone_hub.enums.ProductStatus;
@@ -13,13 +15,16 @@ import com.example.fone_hub.repository.BrandRepository;
 import com.example.fone_hub.repository.CategoryRepository;
 import com.example.fone_hub.repository.ProductRepository;
 import com.example.fone_hub.service.ProductService;
+import com.example.fone_hub.utils.ExcelProductHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -39,10 +44,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<ProductResponse> getAllProducts(
+            int page, int size,
+            String sortField, String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ?
+                Sort.by(sortField).ascending() :
+                Sort.by(sortField).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findAll(pageable)
+                .map(productMapper::productToProductResponse);
+    }
+
+    @Override
     public Page<ProductResponse> getAllProductsPaginated(
             int page, int size,
             String sortField, String sortDir,
-            String name, ProductStatus status
+            String name, List<ProductStatus> status
     ) {
         Sort sort = sortDir.equalsIgnoreCase("asc") ?
                 Sort.by(sortField).ascending() :
@@ -53,9 +73,9 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> entities;
 
         if (name != null && !name.trim().isEmpty()) {
-            entities = productRepository.findByNameContainingIgnoreCaseAndStatus(name, status, pageable);
+            entities = productRepository.findByNameContainingIgnoreCaseAndStatusIn(name, status, pageable);
         } else {
-            entities = productRepository.findByStatus(status, pageable);
+            entities = productRepository.findByStatusIn(status, pageable);
         }
         return entities.map(productMapper::productToProductResponse);
     }
@@ -69,18 +89,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest productRequest) {
-        if(productRepository.existsByNameAndStatus(productRequest.name(), ProductStatus.ACTIVE)){
+        if(productRepository.existsByNameAndStatus(productRequest.getName(), ProductStatus.ACTIVE)){
             throw new AppException(ErrorCode.ENTITY_EXIST);
         }
 
         Product newProduct = productMapper.productRequestToProduct(productRequest);
         newProduct.setCreateDate(LocalDate.now());
 
-        var brand = brandRepository.findByIdAndStatus(productRequest.brandId(), LinkedStatus.LINKED)
+        var brand = brandRepository.findByIdAndStatus(productRequest.getBrandId(), LinkedStatus.LINKED)
                 .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_EXIST));
         newProduct.setBrand(brand);
 
-        var category = categoryRepository.findById(productRequest.categoryId())
+        var category = categoryRepository.findById(productRequest.getCategoryId())
                 .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_EXIST));
         newProduct.setCategory(category);
 
@@ -89,27 +109,27 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse updateProduct(Long productId, ProductRequest request) {
-        if(productRepository.existsByNameAndStatus(request.name(), ProductStatus.ACTIVE)){
+        if(productRepository.existsByNameAndStatus(request.getName(), ProductStatus.ACTIVE)){
             throw new  AppException(ErrorCode.ENTITY_NOT_EXIST);
         }
 
         Product updatedProduct = productRepository.findByIdAndStatus(productId, ProductStatus.ACTIVE)
                 .orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_EXIST));
 
-        if(request.name() != null && !request.name().isEmpty()){
-            updatedProduct.setName(request.name());
+        if(request.getName() != null && !request.getName().isEmpty()){
+            updatedProduct.setName(request.getName());
         }
-        if(request.price() != null){
-            updatedProduct.setPrice(request.price());
+        if(request.getPrice() != null){
+            updatedProduct.setPrice(request.getPrice());
         }
-        if(request.discount() != null){
-            updatedProduct.setDiscount(request.discount());
+        if(request.getDiscount() != null){
+            updatedProduct.setDiscount(request.getDiscount());
         }
-        if(request.color() != null && !request.color().isEmpty()){
-            updatedProduct.setColor(request.color());
+        if(request.getConnectivity() != null && !request.getColor().isEmpty()){
+            updatedProduct.setColor(request.getColor());
         }
-        if(request.quantity() != null){
-            updatedProduct.setQuantity(request.quantity());
+        if(request.getQuantity() != null){
+            updatedProduct.setQuantity(request.getQuantity());
         }
 
         updatedProduct.setUpdateDate(LocalDate.now());
@@ -153,7 +173,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getProductSale(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return productRepository.findByStatus(ProductStatus.ACTIVE, pageable).stream()
+        return productRepository.findByStatusIn(List.of(ProductStatus.ACTIVE), pageable).stream()
                 .map(productMapper::productToProductResponse)
                 .sorted(Comparator.comparing(ProductResponse::discount).reversed())
                 .limit(10)
@@ -163,11 +183,42 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getProductNewest(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return productRepository.findByStatus(ProductStatus.ACTIVE, pageable).stream()
+        return productRepository.findByStatusIn(List.of(ProductStatus.ACTIVE), pageable).stream()
                 .map(productMapper::productToProductResponse)
                 .sorted(Comparator.comparing(ProductResponse::createDate).reversed())
                 .limit(10)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void importProductsFromExcel(MultipartFile file) {
+        try {
+            List<Product> products = ExcelProductHelper.excelToProducts(file.getInputStream());
+
+            for (Product product : products) {
+                // Xử lý danh mục
+                Category category = categoryRepository.findByName(product.getCategory().getName())
+                        .orElseGet(() -> {
+                            Category newCategory = new Category();
+                            newCategory.setName(product.getCategory().getName());
+                            return categoryRepository.save(newCategory);
+                        });
+                product.setCategory(category);
+
+                // Xử lý thương hiệu
+                Brand brand = brandRepository.findByName(product.getBrand().getName())
+                        .orElseGet(() -> {
+                            Brand newBrand = new Brand();
+                            newBrand.setName(product.getBrand().getName());
+                            return brandRepository.save(newBrand);
+                        });
+                product.setBrand(brand);
+            }
+
+            productRepository.saveAll(products);
+        } catch (IOException e) {
+            throw new RuntimeException("Lỗi khi lưu dữ liệu từ Excel: " + e.getMessage());
+        }
     }
 }
 

@@ -1,9 +1,10 @@
 package com.example.fone_hub.service;
 
 import com.example.fone_hub.entity.Cart;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public interface CartService {
     // Get All Cart
     List<Cart> getCart(Long userId);

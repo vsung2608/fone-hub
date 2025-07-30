@@ -22,6 +22,13 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
+    public List<CategoryResponse> getAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(categoryMapper::categoryToCategoryResponse)
+                .toList();
+    }
+
+    @Override
     public CategoryResponse getCategoryById(Long categoryId) {
         var category = categoryRepository.findById(categoryId).
                 orElseThrow(() -> new AppException(ErrorCode.ENTITY_NOT_EXIST));
